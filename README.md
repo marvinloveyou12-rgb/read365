@@ -1,3 +1,14 @@
+---
+title: 독서로 FAQ 챗봇
+emoji: 📚
+colorFrom: blue
+colorTo: indigo
+sdk: streamlit
+sdk_version: 1.32.0
+app_file: app.py
+pinned: false
+---
+
 # 독서로 FAQ 챗봇 📚
 
 독서로(read365.edunet.net) FAQ 문서를 기반으로 선생님들의 질문에 AI가 답변하는 챗봇입니다.  
