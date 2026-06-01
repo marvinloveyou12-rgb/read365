@@ -87,6 +87,32 @@ body {
 .sidebar-links a:hover { color: #fff; text-decoration: underline; }
 .contact { font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
 
+.maker-info {
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.maker-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.5);
+}
+.maker-link {
+  color: #7ec8e3;
+  font-size: 0.83rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.maker-link:hover { color: #fff; text-decoration: underline; }
+.maker-desc {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.4;
+}
+
 /* ── 채팅 영역 ────────────────────────────── */
 .chat-area {
   flex: 1;
