@@ -10,17 +10,12 @@ from pathlib import Path
 
 from langchain_community.document_loaders import TextLoader, PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings, HuggingFaceEndpoint
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEndpoint
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
 
 DATA_DIR = Path(__file__).parent / "data"
 
-SYSTEM_PROMPT = PromptTemplate(
-    input_variables=["context", "question"],
-    template="""You are a helpful assistant for the Korean educational reading platform '독서로' (read365.edunet.net).
+PROMPT_TEMPLATE = """You are a helpful assistant for the Korean educational reading platform '독서로' (read365.edunet.net).
 Answer the teacher's question in Korean based only on the FAQ documents provided below.
 
 Rules:
@@ -36,8 +31,7 @@ Rules:
 [Question]
 {question}
 
-[Answer in Korean]""",
-)
+[Answer in Korean]"""
 
 
 def load_documents() -> list:
@@ -71,15 +65,16 @@ def build_vectorstore_in_memory() -> FAISS:
     return FAISS.from_documents(chunks, embeddings)
 
 
-def build_qa_chain(vectorstore: FAISS) -> RetrievalQA:
+def build_qa_chain(vectorstore: FAISS) -> dict:
     hf_token = os.environ.get("HF_TOKEN", "")
     if not hf_token:
         raise ValueError("HF_TOKEN 환경변수가 설정되지 않았습니다.")
 
+    os.environ["HUGGINGFACEHUB_API_TOKEN"] = hf_token
+
     llm = HuggingFaceEndpoint(
         repo_id="mistralai/Mistral-7B-Instruct-v0.3",
         task="text-generation",
-        huggingfacehub_api_token=hf_token,
         max_new_tokens=512,
         temperature=0.1,
     )
@@ -88,18 +83,21 @@ def build_qa_chain(vectorstore: FAISS) -> RetrievalQA:
         search_type="similarity",
         search_kwargs={"k": 4},
     )
-    return RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=retriever,
-        chain_type_kwargs={"prompt": SYSTEM_PROMPT},
-        return_source_documents=True,
-    )
+
+    return {"llm": llm, "retriever": retriever}
 
 
-def answer(question: str, chain: RetrievalQA) -> dict:
-    result = chain.invoke({"query": question})
+def answer(question: str, chain: dict) -> dict:
+    llm = chain["llm"]
+    retriever = chain["retriever"]
+
+    source_docs = retriever.invoke(question)
+    context = "\n\n".join(doc.page_content for doc in source_docs)
+
+    prompt = PROMPT_TEMPLATE.format(context=context, question=question)
+    result = llm.invoke(prompt)
+
     return {
-        "answer": result["result"],
-        "sources": [doc.page_content[:200] for doc in result["source_documents"]],
+        "answer": result,
+        "sources": [doc.page_content[:200] for doc in source_docs],
     }
