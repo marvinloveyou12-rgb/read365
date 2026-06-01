@@ -1,4 +1,5 @@
 import os
+import traceback
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -45,8 +46,12 @@ class ChatResponse(BaseModel):
 async def chat(req: ChatRequest):
     if not chain:
         raise HTTPException(status_code=503, detail="준비 중입니다. 잠시 후 다시 시도해 주세요.")
-    result = rag_answer(req.message, chain)
-    return ChatResponse(answer=result["answer"], sources=result["sources"])
+    try:
+        result = rag_answer(req.message, chain)
+        return ChatResponse(answer=result["answer"], sources=result["sources"])
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/health")
