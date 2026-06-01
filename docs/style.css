@@ -27,13 +27,25 @@ body {
 
 .logo {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(255,255,255,0.15);
 }
-.logo-icon { font-size: 1.6rem; }
-.logo-text { font-size: 1.1rem; font-weight: 700; }
+.logo-img {
+  width: 140px;
+  height: auto;
+  border-radius: 6px;
+  background: #fff;
+  padding: 4px 8px;
+}
+.logo-sub {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.03em;
+  padding-left: 2px;
+}
 
 .sidebar-label {
   font-size: 0.72rem;
@@ -85,9 +97,19 @@ body {
 
 .chat-header {
   background: #fff;
-  padding: 16px 24px;
+  padding: 12px 24px;
   border-bottom: 1px solid #e2e8f0;
   flex-shrink: 0;
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.header-logo {
+  height: 40px;
+  width: auto;
+  border-radius: 4px;
 }
 .chat-header h1 { font-size: 1.15rem; color: #1e3a5f; }
 .chat-header p  { font-size: 0.82rem; color: #64748b; margin-top: 2px; }
