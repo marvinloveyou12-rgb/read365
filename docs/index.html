@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>독서로 FAQ 챗봇</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="layout">
+
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="logo">
+        <span class="logo-icon">📚</span>
+        <span class="logo-text">독서로 챗봇</span>
+      </div>
+
+      <p class="sidebar-label">자주 묻는 질문</p>
+      <div class="quick-btns" id="quickBtns"></div>
+
+      <div class="sidebar-links">
+        <p class="sidebar-label">바로가기</p>
+        <a href="https://read365.edunet.net" target="_blank">🔗 독서로 사이트</a>
+        <a href="https://read365-school.edunet.net" target="_blank">🔗 학교관리자</a>
+        <p class="contact">에듀콜센터: <strong>1544-0079</strong></p>
+      </div>
+    </aside>
+
+    <!-- 메인 채팅 영역 -->
+    <main class="chat-area">
+      <header class="chat-header">
+        <h1>독서로 FAQ 챗봇 <span class="badge">AI</span></h1>
+        <p>독서로(read365.edunet.net) 관련 궁금한 점을 물어보세요</p>
+      </header>
+
+      <div class="messages" id="messages">
+        <div class="message bot">
+          <div class="avatar">🤖</div>
+          <div class="bubble">
+            안녕하세요! 독서로 FAQ 챗봇입니다. 📚<br><br>
+            회원가입, DLS 인증, 독후활동, 교사 관리 기능 등 궁금한 점을 무엇이든 물어보세요!
+          </div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <textarea
+          id="userInput"
+          placeholder="질문을 입력하세요... (예: DLS 인증은 어떻게 하나요?)"
+          rows="1"
+        ></textarea>
+        <button id="sendBtn" onclick="sendMessage()">전송</button>
+      </div>
+
+      <p class="footer-note">
+        RAG 기반 AI 챗봇 · 정확한 정보는
+        <a href="https://read365.edunet.net" target="_blank">독서로 공식 사이트</a>에서 확인하세요
+      </p>
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
