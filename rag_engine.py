@@ -21,7 +21,8 @@ SYSTEM_MESSAGE = (
     "아래 FAQ 문서만을 바탕으로 선생님의 질문에 한국어로 답하세요. "
     "문서에 없는 내용은 '해당 내용은 독서로 FAQ에서 찾을 수 없습니다. "
     "에듀콜센터(1544-0079)에 문의해 주세요.'라고 답하세요. "
-    "절차 설명 시 번호를 붙여 단계별로 안내하세요."
+    "절차 설명 시 번호를 붙여 단계별로 안내하세요. "
+    "답변 마지막에 반드시 문서의 [출처: ...] 정보를 그대로 포함하세요."
 )
 
 
@@ -77,8 +78,15 @@ def build_qa_chain(vectorstore: FAISS) -> dict:
     return {"client": client, "retriever": retriever}
 
 
+def _extract_source_tag(text: str) -> str:
+    """텍스트에서 [출처: ...] 태그를 추출"""
+    import re
+    match = re.search(r'\[출처:[^\]]+\]', text)
+    return match.group(0) if match else ""
+
+
 def _fallback_answer(source_docs: list) -> str:
-    """LLM 없이 검색된 FAQ 원문을 직접 반환"""
+    """LLM 없이 검색된 FAQ 원문을 직접 반환 (출처 포함)"""
     if not source_docs:
         return (
             "해당 내용은 독서로 FAQ에서 찾을 수 없습니다.\n"
@@ -97,9 +105,15 @@ def answer(question: str, chain: dict) -> dict:
     source_docs = retriever.invoke(question)
     context = "\n\n".join(doc.page_content for doc in source_docs)
 
+    # 출처 태그 수집
+    source_tags = []
+    for doc in source_docs:
+        tag = _extract_source_tag(doc.page_content)
+        if tag and tag not in source_tags:
+            source_tags.append(tag)
+
     if client:
         try:
-            # Mistral instruct 포맷: <s>[INST] ... [/INST]
             prompt = (
                 f"<s>[INST] {SYSTEM_MESSAGE}\n\n"
                 f"[FAQ 문서]\n{context}\n\n"
@@ -121,4 +135,5 @@ def answer(question: str, chain: dict) -> dict:
     return {
         "answer": answer_text,
         "sources": [doc.page_content[:200] for doc in source_docs],
+        "source_tags": source_tags,
     }

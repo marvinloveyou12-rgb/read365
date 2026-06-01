@@ -24,7 +24,7 @@ QUICK_QUESTIONS.forEach((q) => {
 });
 
 // ── 메시지 추가 ─────────────────────────────────────────────────────────────
-function addMessage(role, text, sources = []) {
+function addMessage(role, text, sources = [], sourceTags = []) {
   const container = document.getElementById("messages");
 
   const wrapper = document.createElement("div");
@@ -41,11 +41,24 @@ function addMessage(role, text, sources = []) {
   bubble.textContent = text;
   right.appendChild(bubble);
 
-  // 출처 토글 (봇 메시지에만)
+  // 출처 태그 (봇 메시지에만, 항상 표시)
+  if (role === "bot" && sourceTags.length > 0) {
+    const tagRow = document.createElement("div");
+    tagRow.className = "source-tags";
+    sourceTags.forEach((tag) => {
+      const chip = document.createElement("span");
+      chip.className = "source-chip";
+      chip.textContent = tag;
+      tagRow.appendChild(chip);
+    });
+    right.appendChild(tagRow);
+  }
+
+  // 참고 문서 토글 (봇 메시지에만)
   if (role === "bot" && sources.length > 0) {
     const toggle = document.createElement("div");
     toggle.className = "sources-toggle";
-    toggle.textContent = "▶ 참고 문서 보기";
+    toggle.textContent = "▶ 참고 문서 원문 보기";
 
     const box = document.createElement("div");
     box.className = "sources-box";
@@ -58,7 +71,7 @@ function addMessage(role, text, sources = []) {
     toggle.onclick = () => {
       const open = box.style.display === "block";
       box.style.display = open ? "none" : "block";
-      toggle.textContent = open ? "▶ 참고 문서 보기" : "▼ 참고 문서 닫기";
+      toggle.textContent = open ? "▶ 참고 문서 원문 보기" : "▼ 참고 문서 닫기";
     };
 
     right.appendChild(toggle);
@@ -132,7 +145,7 @@ async function sendMessage(quickText) {
 
     const data = await res.json();
     removeTyping();
-    addMessage("bot", data.answer, data.sources || []);
+    addMessage("bot", data.answer, data.sources || [], data.source_tags || []);
   } catch (e) {
     removeTyping();
     addMessage(

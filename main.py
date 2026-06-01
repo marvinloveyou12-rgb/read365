@@ -40,6 +40,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     answer: str
     sources: list[str]
+    source_tags: list[str] = []
 
 
 @app.post("/chat", response_model=ChatResponse)
@@ -48,7 +49,11 @@ async def chat(req: ChatRequest):
         raise HTTPException(status_code=503, detail="준비 중입니다. 잠시 후 다시 시도해 주세요.")
     try:
         result = rag_answer(req.message, chain)
-        return ChatResponse(answer=result["answer"], sources=result["sources"])
+        return ChatResponse(
+            answer=result["answer"],
+            sources=result["sources"],
+            source_tags=result.get("source_tags", []),
+        )
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

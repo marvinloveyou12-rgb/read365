@@ -197,6 +197,23 @@ body {
   border-color: #2980b9;
 }
 
+/* 출처 태그 칩 */
+.source-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+.source-chip {
+  background: #e8f4fd;
+  border: 1px solid #bdd7ee;
+  color: #1e3a5f;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
 /* 출처 토글 */
 .sources-toggle {
   font-size: 0.75rem;
